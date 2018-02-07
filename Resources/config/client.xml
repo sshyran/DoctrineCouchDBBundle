@@ -17,7 +17,7 @@
 
     <services>
 
-        <service id="doctrine_couchdb.client.connection" class="%doctrine_couchdb.client.connection.class%">
+        <service id="doctrine_couchdb.client.connection" class="%doctrine_couchdb.client.connection.class%" public="true">
             <factory class="%doctrine_couchdb.client.connection.class%" method="create" />
         </service>
 

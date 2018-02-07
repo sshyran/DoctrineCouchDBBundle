@@ -5,13 +5,17 @@ namespace Doctrine\Bundle\CouchDBBundle\Tests;
 
 use Doctrine\Bundle\CouchDBBundle\DoctrineCouchDBBundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class BundleTest extends TestCase
 {
     public function testRegisterCompilerPasses()
     {
         $bundle = new DoctrineCouchDBBundle();
-        $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('hasExtension', 'addCompilerPass'));
+        $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->setConstructorArgs([new ParameterBag(array('hasExtension', 'addCompilerPass'))])
+            ->getMock();
+
         $builder->expects($this->at(0))->method('hasExtension')->will($this->returnValue(false));
 
         $builder->expects($this->at(1))

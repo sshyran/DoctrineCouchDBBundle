@@ -8,9 +8,9 @@ use Symfony\Bundle\DoctrineBundle\Annotations\IndexedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Doctrine\Bundle\CouchDBBundle\DependencyInjection\DoctrineCouchDBExtension;
 
@@ -86,7 +86,7 @@ class ContainerTest extends TestCase
             )
         ), $container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array(new ResolveDefinitionTemplatesPass()));
+        $container->getCompilerPassConfig()->setOptimizationPasses(array(class_exists(ResolveChildDefinitionsPass::class) ? new ResolveChildDefinitionsPass() : new ResolveDefinitionTemplatesPass()));
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 

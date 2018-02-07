@@ -4,11 +4,18 @@
 namespace Doctrine\Bundle\CouchDBBundle\Tests\DependencyInjection;
 
 use Doctrine\Bundle\CouchDBBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends TestCase
 {
+    /**
+     * @var Configuration
+     */
     private $config;
+    /**
+     * @var Processor
+     */
     private $processor;
 
     public function setUp()
@@ -19,9 +26,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyConfig()
     {
-        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            'The child node "client" at path "doctrine_couch_db" must be configured.');
-        $config = $this->processor->processConfiguration($this->config, array());
+        // , 'The child node "client" at path "doctrine_couch_db" must be configured.'
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->processor->processConfiguration($this->config, array());
     }
 
     public function testEmptyClientLeadsToDefaultConnection()
@@ -30,7 +37,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'default', 'connections' => array(
-                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             ))
         ), $config);
     }
@@ -45,7 +52,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'default', 'connections' => array(
-                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             ))
         ), $config);
     }
@@ -60,7 +67,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'test', 'connections' => array(
-                'test' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'test' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             ))
         ), $config);
     }
@@ -78,8 +85,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'test', 'connections' => array(
-                'test' => array('port' => 4000, 'host' => 'localhost', 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false),
-                'test2' => array('port' => 1984, 'host' => 'localhost', 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'test' => array('port' => 4000, 'host' => 'localhost', 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01),
+                'test2' => array('port' => 1984, 'host' => 'localhost', 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             ))
         ), $config);
     }
@@ -95,7 +102,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'default', 'connections' => array(
-                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             )),
             'odm' => array(
                 'default_document_manager' => 'default',
@@ -132,7 +139,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'client' => array('default_connection' => 'default', 'connections' => array(
-                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false)
+                'default' => array('host' => 'localhost', 'port' => 5984, 'user' => null, 'password' => null, 'ip' => null, 'logging' => false, 'url' => null, 'ssl' => false, 'timeout' => 0.01)
             )),
             'odm' => array(
                 'default_document_manager' => 'test',

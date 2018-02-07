@@ -3,11 +3,11 @@
 
 namespace Doctrine\Bundle\CouchDBBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension;
 use Symfony\Component\Config\FileLocator;
@@ -72,10 +72,11 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
     protected function loadClientConnection($name, array $connection, ContainerBuilder $container)
     {
         $container
-            ->setDefinition(sprintf('doctrine_couchdb.client.%s_connection', $name), new DefinitionDecorator('doctrine_couchdb.client.connection'))
+            ->setDefinition(sprintf('doctrine_couchdb.client.%s_connection', $name), $this->getDecorator('doctrine_couchdb.client.connection'))
             ->setArguments(array(
                 $connection,
             ))
+            ->setPublic(true)
         ;
 
         if (isset($connection['logging']) && $connection['logging'] === true) {
@@ -83,7 +84,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
             $def->setFactory([new Reference(sprintf('doctrine_couchdb.client.%s_connection', $name)), 'getHttpClient']);
             $def->setPublic(false);
 
-            $container->setDefinition(sprintf('doctrine_couchdb.httpclient.%s_client', $name), $def);
+            $container->setDefinition(sprintf('doctrine_couchdb.httpclient.%s_client', $name), $def)->setPublic(true);
 
             $def = $container->getDefinition('doctrine_couchdb.datacollector');
             $def->addMethodCall('addLoggingClient', array(
@@ -93,7 +94,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
         }
     }
 
-    private function odmLoad($config, $container)
+    private function odmLoad($config, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('odm.xml');
@@ -129,7 +130,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
             throw new \LogicException('You cannot enable "auto_mapping" when several CouchDB document managers are defined.');
         }
 
-        $odmConfigDef = $container->setDefinition(sprintf('doctrine_couchdb.odm.%s_configuration', $documentManager['name']), new DefinitionDecorator('doctrine_couchdb.odm.configuration'));
+        $odmConfigDef = $container->setDefinition(sprintf('doctrine_couchdb.odm.%s_configuration', $documentManager['name']), $this->getDecorator('doctrine_couchdb.odm.configuration'))->setPublic(true);
 
         $this->loadOdmDocumentManagerMappingInformation($documentManager, $odmConfigDef, $container);
         $this->loadOdmDocumentManagerDesignDocuments($documentManager, $odmConfigDef);
@@ -152,16 +153,20 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
             $documentManager['connection'] = $this->defaultConnection;
         }
 
-        $def = $container->setDefinition(sprintf('doctrine_couchdb.odm.%s_connection.event_manager', $documentManager['name']), new DefinitionDecorator('doctrine_couchdb.odm.document_manager.event_manager'));
-
         $container
-            ->setDefinition(sprintf('doctrine_couchdb.odm.%s_document_manager', $documentManager['name']), new DefinitionDecorator('doctrine_couchdb.odm.document_manager.abstract'))
+            ->setDefinition(sprintf('doctrine_couchdb.odm.%s_document_manager', $documentManager['name']), $this->getDecorator('doctrine_couchdb.odm.document_manager.abstract'))
             ->setArguments(array(
                 new Reference(sprintf('doctrine_couchdb.client.%s_connection', $documentManager['connection'])),
                 new Reference(sprintf('doctrine_couchdb.odm.%s_configuration', $documentManager['name'])),
                 new Reference(sprintf('doctrine_couchdb.odm.%s_connection.event_manager', $documentManager['name']))
             ))
+            ->setPublic(true)
         ;
+    }
+
+    private function getDecorator($service)
+    {
+        return class_exists(DefinitionDecorator::class) ? new DefinitionDecorator($service) : new ChildDefinition($service);
     }
 
     protected function getMappingDriverBundleConfigDefaults(array $bundleConfig, \ReflectionClass $bundle, ContainerBuilder $container)
@@ -248,7 +253,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
 
         $driver = $cacheName."_driver";
         $cacheDef = $this->getDocumentManagerCacheDefinition($documentManager, $documentManager[$driver], $container);
-        $container->setDefinition($cacheDriverService, $cacheDef);
+        $container->setDefinition($cacheDriverService, $cacheDef)->setPublic(true);
     }
 
     /**
@@ -272,7 +277,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
                 $memcacheInstance->addMethodCall('connect', array(
                     $memcacheHost, $memcachePort
                 ));
-                $container->setDefinition(sprintf('doctrine_couchdb.odm.%s_memcache_instance', $documentManager['name']), $memcacheInstance);
+                $container->setDefinition(sprintf('doctrine_couchdb.odm.%s_memcache_instance', $documentManager['name']), $memcacheInstance)->setPublic(true);
                 $cacheDef->addMethodCall('setMemcache', array(new Reference(sprintf('doctrine_couchdb.odm.%s_memcache_instance', $documentManager['name']))));
                 break;
             case 'apc':
