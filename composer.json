@@ -13,7 +13,7 @@
         "php": ">=5.5",
         "doctrine/couchdb-odm": "@dev",
         "doctrine/couchdb": "@dev",
-        "symfony/doctrine-bridge": "~2.3|~3.0",
+        "symfony/doctrine-bridge": "~2.3|~3.0|~4.0",
         "symfony/framework-bundle": "~2.3|~3.0|~4.0"
     },
     "require-dev": {
