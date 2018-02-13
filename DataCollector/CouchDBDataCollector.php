@@ -29,7 +29,7 @@ class CouchDBDataCollector extends DataCollector
     
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data = array('duration' => array(), 'requests' => array(), 'requestcount' => 0, 'total_duration' => 0);
+        $this->reset();
         foreach ($this->clients AS $name => $client) {
             $this->data['duration'][$name] = $client->totalDuration;
             $this->data['requests'][$name] = $client->requests;
@@ -61,5 +61,10 @@ class CouchDBDataCollector extends DataCollector
     public function getName()
     {
         return 'couchdb';
+    }
+
+    public function reset()
+    {
+        $this->data = array('duration' => array(), 'requests' => array(), 'requestcount' => 0, 'total_duration' => 0);
     }
 }
