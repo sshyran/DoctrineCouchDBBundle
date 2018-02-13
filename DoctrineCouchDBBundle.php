@@ -43,10 +43,6 @@ class DoctrineCouchDBBundle extends Bundle
 
     public function boot()
     {
-        // force Doctrine annotations to be loaded
-        // should be removed when a better solution is found in Doctrine
-        class_exists('Doctrine\ODM\CouchDB\Mapping\Driver\AnnotationDriver');
-
         // Register an autoloader for proxies to avoid issues when unserializing them
         // when the ORM is used.
         if ($this->container->hasParameter('doctrine_couchdb.odm.proxy_namespace')) {
