@@ -16,10 +16,24 @@ namespace Doctrine\Bundle\CouchDBBundle;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry as BaseManagerRegistry;
 use Doctrine\ODM\CouchDB\CouchDBException;
-use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ManagerRegistry extends BaseManagerRegistry
 {
+    public function __construct($name, array $connections, array $managers, $defaultConnection, $defaultManager, $proxyInterfaceName, ContainerInterface $container = null)
+    {
+        $parentTraits = class_uses(parent::class);
+        if (isset($parentTraits[ContainerAwareTrait::class])) {
+            // this case should be removed when Symfony 3.4 becomes the lowest supported version
+            // and then also, the constructor should type-hint Psr\Container\ContainerInterface
+            $this->setContainer($container);
+        } else {
+            $this->container = $container;
+        }
+        parent::__construct($name, $connections, $managers, $defaultConnection, $defaultManager, $proxyInterfaceName);
+    }
+
     /**
      * Resolves a registered namespace alias to the full namespace.
      *
@@ -37,16 +51,5 @@ class ManagerRegistry extends BaseManagerRegistry
         }
 
         throw CouchDBException::unknownDocumentNamespace($alias);
-    }
-
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0 alongside with the ContainerAwareInterface type.
-     * @final since version 3.4
-     */
-    public function setContainer(SymfonyContainerInterface $container = null)
-    {
-        if (is_callable('parent::setContainer')) {
-            parent::setContainer($container);
-        }
     }
 }
