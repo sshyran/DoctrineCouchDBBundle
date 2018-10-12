@@ -117,6 +117,7 @@ class DoctrineCouchDBExtension extends AbstractDoctrineExtension
         }
 
         $container->setAlias('doctrine_couchdb.odm.document_manager', sprintf('doctrine_couchdb.odm.%s_document_manager', $config['default_document_manager']));
+        $container->getAlias('doctrine_couchdb.odm.document_manager')->setPublic(true);
 
         foreach ($config['document_managers'] as $name => $documentManager) {
             $documentManager['name'] = $name;
