@@ -39,6 +39,12 @@
     </parameters>
 
     <services>
+        <defaults public="true" />
+
+        <prototype namespace="Doctrine\Bundle\CouchDBBundle\Command\" resource="../../Command">
+            <tag name="console.command" />
+        </prototype>
+        
         <service id="doctrine_couchdb.odm.metadata.annotation_reader" class="%doctrine_couchdb.odm.metadata.annotation_reader.class%" public="false"></service>
 
         <service id="doctrine_couchdb.odm.proxy_cache_warmer" class="%doctrine_couchdb.odm.proxy_cache_warmer.class%" public="false">
